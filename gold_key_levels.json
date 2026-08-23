@@ -1,0 +1,127 @@
+{
+  "generated": "2026-07-07 15:11:45.877007",
+  "data_range": "2026-01-07 08:00:00+00:00 to 2026-07-07 06:00:00+00:00",
+  "total_candles": 2822,
+  "strong_levels": [
+    {
+      "price": 5430,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 50.0,
+      "sell_bounce_pct": 75.0,
+      "overall_bounce_pct": 70.0,
+      "tests": 10
+    },
+    {
+      "price": 4100,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 53.3,
+      "sell_bounce_pct": 77.8,
+      "overall_bounce_pct": 66.7,
+      "tests": 33
+    },
+    {
+      "price": 5420,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 50.0,
+      "sell_bounce_pct": 70.0,
+      "overall_bounce_pct": 66.7,
+      "tests": 12
+    },
+    {
+      "price": 4110,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 46.2,
+      "sell_bounce_pct": 80.0,
+      "overall_bounce_pct": 64.3,
+      "tests": 28
+    },
+    {
+      "price": 4120,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 57.1,
+      "sell_bounce_pct": 72.7,
+      "overall_bounce_pct": 64.0,
+      "tests": 25
+    },
+    {
+      "price": 4230,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 55.6,
+      "sell_bounce_pct": 66.7,
+      "overall_bounce_pct": 60.6,
+      "tests": 33
+    },
+    {
+      "price": 4370,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 45.2,
+      "sell_bounce_pct": 75.0,
+      "overall_bounce_pct": 58.2,
+      "tests": 55
+    },
+    {
+      "price": 4090,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 47.4,
+      "sell_bounce_pct": 68.8,
+      "overall_bounce_pct": 57.1,
+      "tests": 35
+    },
+    {
+      "price": 4130,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 50.0,
+      "sell_bounce_pct": 66.7,
+      "overall_bounce_pct": 56.7,
+      "tests": 30
+    },
+    {
+      "price": 4380,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 50.0,
+      "sell_bounce_pct": 69.2,
+      "overall_bounce_pct": 56.4,
+      "tests": 39
+    },
+    {
+      "price": 4360,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 47.4,
+      "sell_bounce_pct": 66.7,
+      "overall_bounce_pct": 56.3,
+      "tests": 71
+    },
+    {
+      "price": 5400,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 33.3,
+      "sell_bounce_pct": 70.0,
+      "overall_bounce_pct": 56.2,
+      "tests": 16
+    },
+    {
+      "price": 5410,
+      "type": "RESISTANCE",
+      "buy_bounce_pct": 20.0,
+      "sell_bounce_pct": 72.7,
+      "overall_bounce_pct": 56.2,
+      "tests": 16
+    },
+    {
+      "price": 4900,
+      "type": "PIVOT",
+      "buy_bounce_pct": 58.6,
+      "sell_bounce_pct": 52.2,
+      "overall_bounce_pct": 55.8,
+      "tests": 52
+    },
+    {
+      "price": 4400,
+      "type": "PIVOT",
+      "buy_bounce_pct": 59.1,
+      "sell_bounce_pct": 50.0,
+      "overall_bounce_pct": 55.6,
+      "tests": 36
+    }
+  ]
+}
