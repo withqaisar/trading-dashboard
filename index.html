@@ -63,6 +63,26 @@
       function hasText(t) {
         try { return document.body.innerText.toUpperCase().indexOf(t) !== -1; } catch (e) { return false; }
       }
+      function findTxt(label) {   /* like findVal but returns TEXT (for pattern names, WIN/LOSS) */
+        var els = document.querySelectorAll('div,span,p,td,h1,h2,h3,h4,h5,h6,button');
+        var lab = null;
+        for (var i = 0; i < els.length; i++) {
+          if (els[i].textContent.trim().toLowerCase() === label) { lab = els[i]; break; }
+        }
+        if (!lab) return null;
+        var box = lab.parentElement;
+        for (var up = 0; up < 5 && box; up++, box = box.parentElement) {
+          var cand = box.querySelectorAll('*');
+          for (var j = 0; j < cand.length; j++) {
+            var e = cand[j];
+            if (e === lab || e.contains(lab)) continue;
+            var t = e.textContent.trim();
+            if (t && t.length >= 2 && t.length <= 40 && e.children.length === 0
+                && t.toLowerCase() !== label) return t;
+          }
+        }
+        return null;
+      }
       function send() {
         try {
           var payload = {
@@ -70,6 +90,9 @@
             avg: findVal('indicator average'),
             conflict: hasText('ACTIVE CONFLICT'),
             btc_divergence: hasText('DIVERGENCE RISK'),
+            ai_confidence: findVal('confidence'),       /* AI MIND tab (when visible in page) */
+            ai_predicted: findTxt('predicted'),         /* AI MIND tab: WIN / LOSS */
+            genius_best: findTxt('best pattern'),       /* GENIUS tab: e.g. "3 BAR PLAY BULL" */
             indicators: {
               smart_money: findVal('smart money'),
               smc_structure: findVal('smc structure'),
