@@ -32,5 +32,55 @@
         });
       }
     </script>
+    <script>
+    /* ================================================================
+       AI BOT BRIDGE (auto-added)
+       Reads the SIGNAL tab values from this page every 30 seconds
+       and sends them to the trading bot running on this PC.
+       Requirement: the bot (py bot.py) must be running, and this
+       page must stay open in a browser tab on the SAME computer.
+       ================================================================ */
+    (function () {
+      function findVal(label) {
+        var all = Array.prototype.slice.call(document.querySelectorAll('*'));
+        var lab = all.find(function (e) {
+          return e.children.length === 0 && e.textContent.trim().toLowerCase() === label;
+        });
+        if (!lab) return null;
+        var box = lab.parentElement;
+        for (var up = 0; up < 4 && box; up++, box = box.parentElement) {
+          var numEl = Array.prototype.slice.call(box.querySelectorAll('*')).find(function (e) {
+            return e !== lab && e.children.length === 0 && /^[+-]?\d+(\.\d+)?$/.test(e.textContent.trim());
+          });
+          if (numEl) return parseFloat(numEl.textContent);
+        }
+        return null;
+      }
+      function send() {
+        try {
+          var payload = {
+            symbol: 'XAUUSD',
+            avg: findVal('indicator average'),
+            indicators: {
+              smart_money: findVal('smart money'),
+              smc_structure: findVal('smc structure'),
+              htf_confluence: findVal('htf confluence'),
+              macro: findVal('macro'),
+              grid_25: findVal('25-ind grid'),
+              session: findVal('session')
+            },
+            time: new Date().toISOString()
+          };
+          fetch('http://localhost:8787/signal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).catch(function () {});
+        } catch (e) {}
+      }
+      setInterval(send, 30000);
+      setTimeout(send, 5000);
+    })();
+    </script>
   </body>
 </html>
