@@ -42,17 +42,21 @@
        ================================================================ */
     (function () {
       function findVal(label) {
-        var all = Array.prototype.slice.call(document.querySelectorAll('*'));
-        var lab = all.find(function (e) {
-          return e.children.length === 0 && e.textContent.trim().toLowerCase() === label;
-        });
+        var els = document.querySelectorAll('div,span,p,td,h1,h2,h3,h4,h5,h6,button');
+        var lab = null;
+        for (var i = 0; i < els.length; i++) {
+          if (els[i].textContent.trim().toLowerCase() === label) { lab = els[i]; break; }
+        }
         if (!lab) return null;
         var box = lab.parentElement;
-        for (var up = 0; up < 4 && box; up++, box = box.parentElement) {
-          var numEl = Array.prototype.slice.call(box.querySelectorAll('*')).find(function (e) {
-            return e !== lab && e.children.length === 0 && /^[+-]?\d+(\.\d+)?$/.test(e.textContent.trim());
-          });
-          if (numEl) return parseFloat(numEl.textContent);
+        for (var up = 0; up < 5 && box; up++, box = box.parentElement) {
+          var cand = box.querySelectorAll('*');
+          for (var j = 0; j < cand.length; j++) {
+            var e = cand[j];
+            if (e === lab || e.contains(lab)) continue;
+            var t = e.textContent.trim();
+            if (/^[+-]?\d+(\.\d+)?$/.test(t)) return parseFloat(t);
+          }
         }
         return null;
       }
