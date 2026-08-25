@@ -60,11 +60,16 @@
         }
         return null;
       }
+      function hasText(t) {
+        try { return document.body.innerText.toUpperCase().indexOf(t) !== -1; } catch (e) { return false; }
+      }
       function send() {
         try {
           var payload = {
             symbol: 'XAUUSD',
             avg: findVal('indicator average'),
+            conflict: hasText('ACTIVE CONFLICT'),
+            btc_divergence: hasText('DIVERGENCE RISK'),
             indicators: {
               smart_money: findVal('smart money'),
               smc_structure: findVal('smc structure'),
