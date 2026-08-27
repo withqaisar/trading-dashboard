@@ -58,11 +58,25 @@
     </script>
     <script>
     /* ================================================================
-       AI BOT BRIDGE (auto-added)
-       Reads the SIGNAL tab values from this page every 30 seconds
-       and sends them to the trading bot running on this PC.
-       Requirement: the bot (py bot.py) must be running, and this
-       page must stay open in a browser tab on the SAME computer.
+AI BOT BRIDGE v2 — paste into GitHub index.html
+
+HOW TO INSTALL:
+1. Open https://github.com/withqaisar/trading-dashboard
+2. Click index.html -> pencil (Edit)
+3. Find the LAST <script> block at the bottom — it starts with
+   "AI BOT BRIDGE (auto-added)" and ends with </script>
+4. Delete that WHOLE block and paste THIS block in its place
+5. Commit changes, wait 1-2 min, then on the VPS close the app
+   tab in Firefox and open it again (fresh load)
+================================================================
+
+    <script>
+    /* ================================================================
+       AI BOT BRIDGE v2 (auto-added)
+       1) SIGNAL sync (every 30s): master signal + indicator values
+       2) NEWSFEED sync (every 60s): economic calendar + war/econ news
+       Requirement: the bot must be running, and this page must stay
+       open in a browser tab on the SAME computer (the VPS).
        ================================================================ */
     (function () {
       function findVal(label) {
@@ -136,7 +150,96 @@
       }
       setInterval(send, 30000);
       setTimeout(send, 5000);
+
+      /* ---------- v2: economic calendar + war/econ news sync ---------- */
+      function findPanelList(headingText) {
+        // primary: code-path tag; fallback: heading text -> panel -> scrollable list
+        var els = document.querySelectorAll('[code-path*="EconomicCalendar.tsx"]');
+        var i;
+        for (i = 0; i < els.length; i++) {
+          var cls = els[i].className || '';
+          if (typeof cls === 'string' && cls.indexOf('overflow-y-auto') !== -1) return els[i];
+        }
+        var hs = document.querySelectorAll('h1,h2,h3,h4,span,div');
+        for (i = 0; i < hs.length; i++) {
+          if ((hs[i].textContent || '').trim() === headingText) {
+            var box = hs[i];
+            for (var up = 0; up < 6 && box; up++, box = box.parentElement) {
+              var ov = box.querySelector('div[class*="overflow-y-auto"]');
+              if (ov) return ov;
+            }
+          }
+        }
+        return null;
+      }
+      function scrapeCalendar() {
+        var list = findPanelList('Economic Calendar');
+        if (!list) return [];
+        var rows = list.children, out = [];
+        for (var r = 0; r < rows.length && out.length < 25; r++) {
+          var lines = (rows[r].innerText || '').split('\n');
+          var ev = { time: '', title: '', meta: '', prediction: '', countdown: '' };
+          for (var k = 0; k < lines.length; k++) {
+            var t = lines[k].trim();
+            if (!t) continue;
+            if (!ev.time && /^\d{1,2}:\d{2}$/.test(t)) { ev.time = t; continue; }
+            if (!ev.meta && t.indexOf('\u00B7') !== -1) { ev.meta = t; continue; }
+            if (!ev.prediction && /^(BUY|SELL|WATCH|VOLATILE)$/i.test(t)) { ev.prediction = t.toUpperCase(); continue; }
+            if (!ev.countdown && (/^\d+h\s*\d+m$/i.test(t) || /^\d+\s*m$/i.test(t) || /^live/i.test(t))) { ev.countdown = t; continue; }
+            if (!ev.title && t.length > 3 && t.length < 90) { ev.title = t; }
+          }
+          if (ev.title) out.push(ev);
+        }
+        return out;
+      }
+      function scrapeNews() {
+        var links = document.querySelectorAll('a[code-path*="WarNewsFeed.tsx"]');
+        if (!links.length) {
+          // fallback: external links inside the monitor panel
+          var hs = document.querySelectorAll('h1,h2,h3,h4,span,div');
+          for (var i = 0; i < hs.length; i++) {
+            if ((hs[i].textContent || '').trim().indexOf('EconData Monitor') !== -1
+                && (hs[i].textContent || '').trim().length < 50) {
+              var box = hs[i];
+              for (var up = 0; up < 6 && box; up++, box = box.parentElement) {
+                var found = box.querySelectorAll('a[href^="http"]');
+                if (found.length) { links = found; break; }
+              }
+              break;
+            }
+          }
+        }
+        var out = [];
+        for (var i = 0; i < links.length && out.length < 20; i++) {
+          var a = links[i];
+          var p = a.querySelector('p');
+          var title = p ? (p.textContent || '').trim() : (a.textContent || '').trim().split('\n')[0].trim();
+          if (!title || title.length < 15) continue;
+          var lines = (a.innerText || '').split('\n');
+          var meta = [];
+          for (var k = 0; k < lines.length; k++) {
+            var t = lines[k].trim();
+            if (t && t !== title) meta.push(t);
+          }
+          out.push({ title: title, link: a.href || '', meta: meta.join(' \u00B7 ').slice(0, 140) });
+        }
+        return out;
+      }
+      function sendFeed() {
+        try {
+          var payload = {
+            calendar: scrapeCalendar(),
+            news: scrapeNews(),
+            time: new Date().toISOString()
+          };
+          fetch('http://localhost:8787/newsfeed', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).catch(function () {});
+        } catch (e) {}
+      }
+      setInterval(sendFeed, 60000);
+      setTimeout(sendFeed, 12000);
     })();
     </script>
-  </body>
-</html>
