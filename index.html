@@ -22,12 +22,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script>
     /* ================================================================
-       VPS FIREWALL FIX (auto-added)
+       VPS FIREWALL FIX v2 (auto-added)
        The Exness VPS blocks api.binance.com (signal engine data).
-       This wrapper tries the call directly first; if it fails or is
-       blocked, it retries ONCE through the allorigins proxy (same
-       proxy the news feed already uses successfully).
-       On your home PC nothing changes (direct call succeeds first).
+       Retry once via Binance's own public mirror data-api.binance.vision
+       (same data, no key needed). On your home PC nothing changes.
        ================================================================ */
     (function () {
       var of = window.fetch.bind(window);
@@ -36,15 +34,13 @@
         if (url.indexOf('https://api.binance.com') !== 0) {
           return of(u, o);
         }
-        function viaProxy() {
-          var p = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-          return of(p, o);
-        }
+        var alt = url.replace('https://api.binance.com', 'https://data-api.binance.vision');
+        function viaMirror() { return of(alt, o); }
         try {
           return of(u, o).then(function (res) {
-            return (res && res.ok) ? res : viaProxy();
-          }, function () { return viaProxy(); });
-        } catch (e) { return viaProxy(); }
+            return (res && res.ok) ? res : viaMirror();
+          }, function () { return viaMirror(); });
+        } catch (e) { return viaMirror(); }
       };
     })();
     </script>
