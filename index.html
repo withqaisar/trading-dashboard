@@ -58,20 +58,6 @@
     </script>
     <script>
     /* ================================================================
-AI BOT BRIDGE v2 — paste into GitHub index.html
-
-HOW TO INSTALL:
-1. Open https://github.com/withqaisar/trading-dashboard
-2. Click index.html -> pencil (Edit)
-3. Find the LAST <script> block at the bottom — it starts with
-   "AI BOT BRIDGE (auto-added)" and ends with </script>
-4. Delete that WHOLE block and paste THIS block in its place
-5. Commit changes, wait 1-2 min, then on the VPS close the app
-   tab in Firefox and open it again (fresh load)
-================================================================
-
-    <script>
-    /* ================================================================
        AI BOT BRIDGE v2 (auto-added)
        1) SIGNAL sync (every 30s): master signal + indicator values
        2) NEWSFEED sync (every 60s): economic calendar + war/econ news
@@ -121,11 +107,29 @@ HOW TO INSTALL:
         }
         return null;
       }
+      function findPct(word) {
+        try {
+          var all = document.querySelectorAll('*');
+          for (var i = 0; i < all.length; i++) {
+            var e = all[i];
+            if (e.children.length) continue;
+            var t = e.textContent.trim();
+            var m = t.match(/([+-]?\d+(\.\d+)?)\s*%/);
+            if (!m) continue;
+            var box = e;
+            for (var up = 0; up < 4 && box; up++, box = box.parentElement) {
+              if (box.textContent.toLowerCase().indexOf(word) !== -1) return parseFloat(m[1]);
+            }
+          }
+        } catch (e2) {}
+        return null;
+      }
       function send() {
         try {
           var payload = {
             symbol: 'XAUUSD',
             avg: findVal('indicator average'),
+            btc_change: findPct('btc'),
             conflict: hasText('ACTIVE CONFLICT'),
             btc_divergence: hasText('DIVERGENCE RISK'),
             ai_confidence: findVal('confidence'),
@@ -243,3 +247,5 @@ HOW TO INSTALL:
       setTimeout(sendFeed, 12000);
     })();
     </script>
+  </body>
+</html>
