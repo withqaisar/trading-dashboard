@@ -58,7 +58,7 @@
     </script>
     <script>
     /* ================================================================
-       AI BOT BRIDGE v2 (auto-added)
+       AI BOT BRIDGE v3 (auto-added)
        1) SIGNAL sync (every 30s): master signal + indicator values
        2) NEWSFEED sync (every 60s): economic calendar + war/econ news
        Requirement: the bot must be running, and this page must stay
@@ -124,10 +124,25 @@
         } catch (e2) {}
         return null;
       }
+      function detectSymbol() {
+        try {
+          var els = document.querySelectorAll('[class*="active"], [aria-selected="true"], [data-state="active"]');
+          for (var i = 0; i < els.length; i++) {
+            var t = (els[i].textContent || '').toUpperCase();
+            if (t.length < 60) {
+              if (t.indexOf('BTC') !== -1) return 'BTCUSD';
+              if (t.indexOf('XAU') !== -1 || t.indexOf('GOLD') !== -1) return 'XAUUSD';
+            }
+          }
+        } catch (e) {}
+        return 'XAUUSD';
+      }
       function send() {
         try {
+          var sym = detectSymbol();
+          var port = (sym === 'BTCUSD') ? 8788 : 8787;
           var payload = {
-            symbol: 'XAUUSD',
+            symbol: sym,
             avg: findVal('indicator average'),
             btc_change: findPct('btc'),
             conflict: hasText('ACTIVE CONFLICT'),
@@ -145,7 +160,7 @@
             },
             time: new Date().toISOString()
           };
-          fetch('http://localhost:8787/signal', {
+          fetch('http://localhost:' + port + '/signal', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -236,11 +251,14 @@
             news: scrapeNews(),
             time: new Date().toISOString()
           };
-          fetch('http://localhost:8787/newsfeed', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          }).catch(function () {});
+          var body = JSON.stringify(payload);
+          [8787, 8788].forEach(function (pt) {
+            fetch('http://localhost:' + pt + '/newsfeed', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: body
+            }).catch(function () {});
+          });
         } catch (e) {}
       }
       setInterval(sendFeed, 60000);
