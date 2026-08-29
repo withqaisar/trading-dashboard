@@ -160,11 +160,13 @@
             },
             time: new Date().toISOString()
           };
-          fetch('http://localhost:' + port + '/signal', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          }).catch(function () {});
+          [8787, 8788].forEach(function (pt) {
+            fetch('http://localhost:' + pt + '/signal', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            }).catch(function () {});
+          });
         } catch (e) {}
       }
       setInterval(send, 30000);
